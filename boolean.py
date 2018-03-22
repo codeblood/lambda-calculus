@@ -1,62 +1,38 @@
-# Cesar Barata - github.com/codeblood
-
-# identity function
-ID    = lambda x: x
-
-# boolean values
+#boolean values
 
 # by convention TRUE "chooses the leftmost" and FALSE "chooses the rightmost"
 TRUE  = lambda x: lambda y: x
 FALSE = lambda x: lambda y: y
 
+
+# "AND" logical operator takes two booleans "l" and "r". If "l" is "FALSE" then it chooses itself, otherwise it chooses "r"
 AND   = lambda l: lambda r: l(r)(l)
+
+# "OR" logical operator takes two booleans "l" and "r". If "l" is "TRUE" then it chooses itself, otherwise it chooses "r"
 OR    = lambda l: lambda r: l(l)(r)
-NOT   = lambda b: lambda x: lambda y: b(y)(x)
+
+# "NOT" logical operator takes a boolean and reverses the "choosing" relation
+# The parenthesis were added to make it explicit that "NOT" takes a boolean and returns another boolean (the one inside the parenthesis)
+NOT   = lambda b: (lambda x: lambda y: b(y)(x))
 
 # "isomorphism" with python bool
 
+# Takes a boolean as defined above and converts it into a Python bool
 def lambda_to_boolean(l):
     return l(True)(False)
 
+# Takes a Python bool and converts it into a boolean as defined above
 def boolean_to_lambda(b):
     if b: return TRUE
     else: return FALSE
 
 # pretty printing
-
 def boolean_to_str(b):
     return str(lambda_to_bool(b))
 
-# natural numbers (Church encoding)
-ZERO  = lambda f: lambda x: x
-ONE   = lambda f: lambda x: f(x)
-TWO   = lambda f: lambda x: f(f(x))
-THREE = lambda f: lambda x: f(f(f(x)))
-FOUR  = lambda f: lambda x: f(f(f(f(x))))
-FIVE  = lambda f: lambda x: f(f(f(f(f(x)))))
-
-# "isomorphism" with python (positive) int
-def lambda_to_int(l):
-    return l(lambda x: x + 1)(0)
-
-def int_to_lambda(i):
-    if i < 0 or type(i) == float: raise Exception("undefined for negative integers and floating points")
-
-    if i == 0: return ZERO
-    else: return lambda f: lambda x: int_to_lambda(i - 1)(f)(f(x))
-
-# control structures
-
-# if_then_else command
-IF    = lambda cond: lambda true_case: lambda false_case: cond(true_case)(false_case)(ID)    # equivalent to IF = TRUE
-OMEGA = lambda f: f(f)
-WHILE = lambda cond: lambda body: OMEGA(lambda n: IF(cond)(body)(cond))
-
-
-# testing
-
 # some testing cases for booleans
-def test_boolean():
+
+def test_AND_truth_table():
     # testing AND
     (a,b) = (True, True)
     assert (a and b) == lambda_to_boolean(AND(boolean_to_lambda(a))(boolean_to_lambda(b)))
@@ -67,6 +43,7 @@ def test_boolean():
     (a,b) = (False, False)
     assert (a and b) == lambda_to_boolean(AND(boolean_to_lambda(a))(boolean_to_lambda(b)))
 
+def test_OR_truth_table():
     # testing OR
     (a,b) = (True, True)
     assert (a or b) == lambda_to_boolean(OR(boolean_to_lambda(a))(boolean_to_lambda(b)))
@@ -77,24 +54,9 @@ def test_boolean():
     (a,b) = (False, False)
     assert (a or b) == lambda_to_boolean(OR(boolean_to_lambda(a))(boolean_to_lambda(b)))
 
+def test_NOT_truth_table()
     # testing NOT
     a = True
     assert (not a) == lambda_to_boolean(NOT(boolean_to_lambda(a)))
     a = False
     assert (not a) == lambda_to_boolean(NOT(boolean_to_lambda(a)))
-
-# some testing cases for natural numbers
-def test_natural():
-    import random
-
-    while True:
-        n = random.randint(0,500)
-        assert n == lambda_to_int(int_to_lambda(n))
-
-        if n == 500:
-            break
-
-
-
-test_boolean()
-test_natural()
